@@ -6,6 +6,7 @@ const db = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 const itineraryRoutes = require("./routes/itineraryRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api", itineraryRoutes);
+app.use("/api", expenseRoutes);
 
 app.get("/api/health", (req, res) => {
     res.json({

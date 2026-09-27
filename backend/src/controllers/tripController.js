@@ -98,7 +98,7 @@ async function getTrips(req, res) {
         const userId = req.user.id;
 
         const [trips] = await db.promise().query(
-            `SELECT t.id, t.name, t.description, t.start_date, t.end_date, tm.role
+            `SELECT t.id, t.name, t.description, t.start_date, t.end_date, tm.role, t.currency
             FROM trips t
             JOIN trip_members tm ON t.id = tm.trip_id
             WHERE tm.user_id = ?`,

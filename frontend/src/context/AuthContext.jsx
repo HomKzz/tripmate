@@ -1,13 +1,10 @@
 import {
-    createContext,
-    useContext,
     useEffect,
     useState
 } from "react";
 
-import { getCurrentUser } from "../services/api";
-
-const AuthContext = createContext(null);
+import { getProfile } from "../services";
+import { AuthContext } from "./authContext";
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -23,9 +20,9 @@ export function AuthProvider({ children }) {
             }
 
             try {
-                const data = await getCurrentUser(token);
+                const data = await getProfile();
 
-                setUser(data.data.user);
+                setUser(data.data);
 
             } catch (error) {
                 console.error(error);
@@ -72,8 +69,4 @@ export function AuthProvider({ children }) {
             {children}
         </AuthContext.Provider>
     );
-}
-
-export function useAuth() {
-    return useContext(AuthContext);
 }

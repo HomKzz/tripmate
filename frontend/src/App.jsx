@@ -1,8 +1,7 @@
 import {
     BrowserRouter,
     Routes,
-    Route,
-    Link
+    Route
 } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -11,59 +10,15 @@ import Trips from "./pages/Trips";
 import TripDetail from "./pages/TripDetail";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-
-import { useAuth } from "./context/AuthContext";
-
-function Navigation() {
-    const { user, logout } = useAuth();
-
-    return (
-        <nav>
-            <Link to="/">TripMate</Link>
-            {" | "}
-
-            {user ? (
-                <>
-                    <Link to="/trips">
-                        My Trips
-                    </Link>
-
-                    {" | "}
-
-                    <span>
-                        {user.name}
-                    </span>
-
-                    {" | "}
-
-                    <button onClick={logout}>
-                        Logout
-                    </button>
-                </>
-            ) : (
-                <>
-                    <Link to="/login">
-                        Login
-                    </Link>
-
-                    {" | "}
-
-                    <Link to="/register">
-                        Register
-                    </Link>
-                </>
-            )}
-        </nav>
-    );
-}
+import Layout from "./components/layout/Layout";
 
 function App() {
     return (
         <BrowserRouter>
 
-            <Navigation />
-
             <Routes>
+
+                {/* Public pages */}
 
                 <Route
                     path="/login"
@@ -75,32 +30,33 @@ function App() {
                     element={<Register />}
                 />
 
-                <Route
-                    path="/trips"
-                    element={
-                        <ProtectedRoute>
-                            <Trips />
-                        </ProtectedRoute>
-                    }
-                />
+
+                {/* Protected pages */}
 
                 <Route
-                    path="/trips/:id"
                     element={
                         <ProtectedRoute>
-                            <TripDetail />
+                            <Layout />
                         </ProtectedRoute>
                     }
-                />
+                >
 
-                <Route
-                    path="/"
-                    element={
-                        <ProtectedRoute>
-                            <Trips />
-                        </ProtectedRoute>
-                    }
-                />
+                    <Route
+                        path="/"
+                        element={<Trips />}
+                    />
+
+                    <Route
+                        path="/trips"
+                        element={<Trips />}
+                    />
+
+                    <Route
+                        path="/trips/:id"
+                        element={<TripDetail />}
+                    />
+
+                </Route>
 
             </Routes>
 
