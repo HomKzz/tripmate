@@ -136,8 +136,37 @@ async function login(req, res) {
     }
 }
 
+async function getProfile(req, res) {
+    try {
+        const [users] = await db.promise().query(
+            "SELECT id, name, email FROM users WHERE id = ?",
+            [req.user.id]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "ไม่พบข้อมูลผู้ใช้"
+            });
+        }
+
+        res.json({
+            success: true,
+            data: users[0]
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้"
+        });
+    }
+}
+
 
 module.exports = {
     register,
-    login
+    login,
+    getProfile
 };

@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Map, X } from "lucide-react";
+import { Calculator, LayoutDashboard, Map, X } from "lucide-react";
 import Brand from "../ui/Brand";
 
 const menus = [
     { name: "ภาพรวม", path: "/", icon: LayoutDashboard },
-    { name: "ทริปของฉัน", path: "/trips", icon: Map }
+    { name: "ทริปของฉัน", path: "/trips", icon: Map },
+    { name: "คิดค่าใช้จ่ายรายคน", path: "/expense-splits", icon: Calculator }
 ];
 
 function Sidebar({ isOpen, onClose }) {

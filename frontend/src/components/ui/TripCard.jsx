@@ -11,12 +11,12 @@ const statusStyles = {
     unknown: "bg-[#f8f0e2] text-[#a87942]"
 };
 
-function TripCard({ trip }) {
+function TripCard({ trip, to = `/trips/${trip.id}` }) {
     const status = getTripStatus(trip.start_date, trip.end_date);
     const duration = getTripDuration(trip.start_date, trip.end_date);
 
     return (
-        <Card as={Link} to={`/trips/${trip.id}`} interactive className="group flex h-full flex-col overflow-hidden !p-0">
+        <Card as={Link} to={to} interactive className="group flex h-full flex-col overflow-hidden !p-0">
             <div className="relative h-28 overflow-hidden bg-[#173d2d] p-5 text-white">
                 <div className="absolute -right-8 -top-12 h-36 w-36 rounded-full border border-white/10" />
                 <div className="absolute -right-3 top-7 h-20 w-20 rounded-full border border-[#d9edb8]/20" />

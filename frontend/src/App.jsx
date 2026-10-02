@@ -7,7 +7,9 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Trips from "./pages/Trips";
+import Dashboard from "./pages/Dashboard";
 import TripDetail from "./pages/TripDetail";
+import ExpenseSplits from "./pages/ExpenseSplits";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/layout/Layout";
@@ -43,7 +45,7 @@ function App() {
 
                     <Route
                         path="/"
-                        element={<Trips />}
+                        element={<Dashboard />}
                     />
 
                     <Route
@@ -54,6 +56,21 @@ function App() {
                     <Route
                         path="/trips/:id"
                         element={<TripDetail />}
+                    />
+
+                    <Route
+                        path="/trips/:id/expense-splits"
+                        element={<ExpenseSplits />}
+                    />
+
+                    <Route
+                        path="/expense-splits"
+                        element={<ExpenseSplits />}
+                    />
+
+                    <Route
+                        path="/expense-splits/:id"
+                        element={<ExpenseSplits />}
                     />
 
                 </Route>

@@ -33,3 +33,13 @@ export async function remove(expenseId) {
 
     return response.data;
 }
+
+export async function getSplits(tripId) {
+    const response = await apiClient.get(`/trips/${tripId}/expense-splits`);
+    return response.data;
+}
+
+export async function saveSplits(expenseId, splits) {
+    const response = await apiClient.put(`/expenses/${expenseId}/splits`, { splits });
+    return response.data;
+}

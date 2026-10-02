@@ -6,7 +6,16 @@ import { Button, Brand } from "../ui";
 function Navbar({ onMenuClick }) {
     const { user, logout } = useAuth();
     const location = useLocation();
-    const pageTitle = location.pathname.startsWith("/trips/") ? "รายละเอียดทริป" : "ทริปของฉัน";
+    const path = location.pathname;
+    const pageTitle = path === "/"
+        ? "ภาพรวม"
+        : path === "/trips"
+            ? "ทริปของฉัน"
+            : path.includes("expense-splits")
+                ? "คิดค่าใช้จ่ายรายคน"
+                : path.startsWith("/trips/")
+                    ? "รายละเอียดทริป"
+                    : "ทริปของฉัน";
     const initial = user?.name?.charAt(0).toUpperCase() || "T";
 
     return (

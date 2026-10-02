@@ -15,6 +15,7 @@ function createDefaultForm() {
         currency: "THB",
         expense_date: toDateInputValue(new Date()),
         description: "",
+        expense_time: "",
     };
 }
 
@@ -85,6 +86,7 @@ function ExpenseModal({ tripId, isOpen, onClose, onCreated }) {
                 amount: Number(form.amount),
                 currency: form.currency.trim().toUpperCase(),
                 expense_date: form.expense_date,
+                time_expensed: form.expense_time || null,
                 description: form.description.trim() || null,
             });
 
@@ -176,6 +178,14 @@ function ExpenseModal({ tripId, isOpen, onClose, onCreated }) {
                     onChange={(event) => updateField("expense_date", event.target.value)}
                     error={errors.expense_date}
                     required
+                    disabled={isSubmitting}
+                />
+                <FormField
+                    label="เวลาที่จ่ายเงิน (ไม่บังคับ)"
+                    type="time"
+                    value={form.expense_time}
+                    onChange={(event) => updateField("expense_time", event.target.value)}
+                    error={errors.expense_time}
                     disabled={isSubmitting}
                 />
             </form>

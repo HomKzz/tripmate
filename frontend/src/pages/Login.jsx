@@ -23,7 +23,7 @@ function Login() {
         try {
             const data = await loginUser(email, password);
             login(data.data.token, data.data.user);
-            navigate("/trips");
+            navigate("/");
         } catch (requestError) {
             setError(requestError.message);
         } finally {

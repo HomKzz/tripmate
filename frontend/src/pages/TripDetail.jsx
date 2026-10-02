@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   ArrowLeft,
+  Calculator,
   CalendarDays,
-  CheckCircle2,
   ListChecks,
   Map,
   Plus,
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 import { tripService, itineraryService, expenseService } from "../services";
 import { formatDate, getTripDuration } from "../utils/trip";
-import { ExpenseModal } from "../components/trips";
+import { ExpenseDetailsModal, ExpenseModal, ItineraryModal } from "../components/trips";
 import {
   Alert,
   Button,
@@ -33,6 +34,13 @@ function TripDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isItineraryModalOpen, setIsItineraryModalOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+
+  async function handleItineraryCreated() {
+    const response = await itineraryService.getAll(id);
+    setItinerary(response.data);
+  }
 
   async function handleExpenseCreated() {
     const response = await expenseService.getAll(id);
@@ -87,12 +95,6 @@ function TripDetail() {
       />
     );
   }
-
-  // Total expenses
-  const totalExpenses = expenses.reduce(
-    (total, expense) => total + Number(expense.amount || 0),
-    0,
-  );
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -188,7 +190,7 @@ function TripDetail() {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Members */}
-        <section className="overflow-hidden rounded-2xl border border-[#e4eade] bg-white shadow-[0_12px_35px_-28px_rgba(23,61,45,0.45)]">
+        <section className="flex h-[450px] flex-col overflow-hidden rounded-2xl border border-[#e4eade] bg-white shadow-[0_12px_35px_-28px_rgba(23,61,45,0.45)]">
           <div className="flex items-center justify-between border-b border-[#edf0e8] px-5 py-5 sm:px-6">
             <div>
               <h2 className="flex items-center gap-2 text-lg font-bold text-[#1d3b2e]">
@@ -201,7 +203,7 @@ function TripDetail() {
               {members.length} คน
             </span>
           </div>
-          <div className="p-4 sm:p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
             {members.length === 0 ? (
               <p className="py-5 text-center text-sm text-[#91a094]">
                 ยังไม่มีสมาชิกในทริปนี้
@@ -237,7 +239,7 @@ function TripDetail() {
         </section>
 
         {/* Itinerary */}
-        <section className="overflow-hidden rounded-2xl border border-[#e4eade] bg-white shadow-[0_12px_35px_-28px_rgba(23,61,45,0.45)]">
+        <section className="flex h-[450px] flex-col overflow-hidden rounded-2xl border border-[#e4eade] bg-white shadow-[0_12px_35px_-28px_rgba(23,61,45,0.45)]">
           <div className="flex items-center justify-between border-b border-[#edf0e8] px-5 py-5 sm:px-6">
             <div>
               <h2 className="flex items-center gap-2 text-lg font-bold text-[#1d3b2e]">
@@ -248,19 +250,31 @@ function TripDetail() {
                 ลำดับการเดินทางของคุณ
               </p>
             </div>
-            <span className="rounded-full bg-[#edf6d8] px-2.5 py-1 text-xs font-semibold text-[#577733]">
-              {itinerary.length} กิจกรรม
-            </span>
+            <div className="flex items-center gap-1 sm:gap-2 flex-col">
+              <span className="rounded-full bg-[#edf6d8] px-2.5 py-1 text-xs font-semibold text-[#577733]">
+                {itinerary.length} กิจกรรม
+              </span>
+              {itinerary.length > 0 && (
+              <Button
+                size="xs"
+                className="!rounded-lg !px-2.5 !py-1.5 text-xs"
+                onClick={() => setIsItineraryModalOpen(true)}
+              >
+                เพิ่ม
+              </Button>
+              )}
+            </div>
           </div>
-          <div className="p-4 sm:p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
             {itinerary.length === 0 ? (
-                <EmptyState 
+              <EmptyState
                 icon={<ListChecks size={24} className="text-[#6b9355]" />}
                 title="ยังไม่มีรายการกิจกรรม"
                 description="คุณสามารถเพิ่มกิจกรรมในแผนการเดินทางของคุณได้ เพื่อให้ทุกคนในทริปทราบถึงสิ่งที่ต้องทำ"
                 actionLabel="เพิ่มกิจกรรม"
-                onAction={() => navigate(`/trips/${id}/itinerary`)}
-                />
+                onAction={() => setIsItineraryModalOpen(true)}
+                size="sm"
+              />
             ) : (
               <ol className="space-y-5">
                 {itinerary.map((item, index) => (
@@ -300,6 +314,15 @@ function TripDetail() {
                 ภาพรวมรายจ่ายของทุกคนในทริป
               </p>
             </div>
+            <Button
+              as={Link}
+              to={`/trips/${id}/expense-splits`}
+              variant="outline"
+              size="sm"
+            >
+              <Calculator size={16} />
+              คิดรายบุคคล
+            </Button>
             {/* <div className="text-right">
               <p className="text-xs text-[#91a094]">ยอดรวม</p>
               <p className="mt-0.5 text-xl font-extrabold text-[#246b4d]">
@@ -319,7 +342,7 @@ function TripDetail() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[560px] text-sm">
                   <thead>
-                    <tr className="border-b border-[#edf0e8] text-left">
+                    <tr className="border-b border-[#edf0e8] text-center text-xs font-semibold text-[#7a8b7e]">
                       <th className="pb-3 font-semibold text-[#7a8b7e]">
                         รายการ
                       </th>
@@ -327,10 +350,16 @@ function TripDetail() {
                         จำนวนเงิน
                       </th>
                       <th className="pb-3 font-semibold text-[#7a8b7e]">
+                        วันที่จ่ายเงิน
+                      </th>
+                      <th className="pb-3 font-semibold text-[#7a8b7e]">
                         สกุลเงิน
                       </th>
                       <th className="pb-3 font-semibold text-[#7a8b7e]">
                         ผู้จ่าย
+                      </th>
+                      <th className="pb-3 font-semibold text-[#7a8b7e]">
+                        รายละเอียดเพิ่มเติม
                       </th>
                     </tr>
                   </thead>
@@ -338,19 +367,32 @@ function TripDetail() {
                     {expenses.map((expense) => (
                       <tr
                         key={expense.id}
-                        className="border-b border-[#f1f4ed] last:border-0"
+                        className="border-b border-[#f1f4ed] last:border-0 hover:bg-[#f7f9f3] transition text-center"
                       >
                         <td className="py-4 font-semibold text-[#365544]">
                           {expense.title}
                         </td>
-                        <td className="py-4 font-bold text-[#1d3b2e]">
+                        <td className="py-4 font-semibold text-[#1d3b2e]">
                           {Number(expense.amount || 0).toLocaleString()}
+                        </td>
+                        <td className="py-4 text-[#7a8b7e]">
+                          {formatDate(expense.expense_date)}{" "}
                         </td>
                         <td className="py-4 text-[#7a8b7e]">
                           {expense.currency}
                         </td>
                         <td className="py-4 text-[#7a8b7e]">
                           {expense.paid_by_name || "ไม่ทราบ"}
+                        </td>
+                        <td className="py-4 text-[#7a8b7e]">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedExpense(expense)}
+                          >
+                            ดูรายละเอียด
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -366,6 +408,19 @@ function TripDetail() {
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
         onCreated={handleExpenseCreated}
+      />
+
+      <ItineraryModal
+        tripId={id}
+        isOpen={isItineraryModalOpen}
+        onClose={() => setIsItineraryModalOpen(false)}
+        onCreated={handleItineraryCreated}
+      />
+
+      <ExpenseDetailsModal
+        expense={selectedExpense}
+        isOpen={Boolean(selectedExpense)}
+        onClose={() => setSelectedExpense(null)}
       />
     </div>
   );

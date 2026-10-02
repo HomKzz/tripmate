@@ -2,7 +2,9 @@ const express = require("express");
 
 const {
     createExpense,
-    getExpenses
+    getExpenses,
+    getExpenseSplits,
+    saveExpenseSplits
 } = require("../controllers/expenseController");
 
 const authenticateToken = require("../middleware/authMiddleware");
@@ -19,6 +21,18 @@ router.get(
     "/trips/:tripId/expenses",
     authenticateToken,
     getExpenses
+);
+
+router.get(
+    "/trips/:tripId/expense-splits",
+    authenticateToken,
+    getExpenseSplits
+);
+
+router.put(
+    "/expenses/:expenseId/splits",
+    authenticateToken,
+    saveExpenseSplits
 );
 
 module.exports = router;
