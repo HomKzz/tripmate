@@ -11,6 +11,10 @@ function Navbar({ onMenuClick }) {
         ? "ภาพรวม"
         : path === "/trips"
             ? "ทริปของฉัน"
+            : path.includes("trip-members") || path.includes("/invite/")
+                ? "สมาชิกและคำเชิญ"
+                : path.startsWith("/ai-planner")
+                    ? "วางแผนทริปด้วย AI"
             : path.includes("expense-splits")
                 ? "คิดค่าใช้จ่ายรายคน"
                 : path.startsWith("/trips/")

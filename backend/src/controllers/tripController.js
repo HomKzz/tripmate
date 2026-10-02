@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const jwt = require("jsonwebtoken");
 
 async function createTrip(req, res) {
     const connection = await db.promise().getConnection();
@@ -621,6 +622,133 @@ async function leaveTrip(req, res) {
     }
 }
 
+async function createTripInvite(req, res) {
+    try {
+        const tripId = req.params.tripId;
+        const userId = req.user.id;
+        const [membership] = await db.promise().query(
+            `SELECT role FROM trip_members WHERE trip_id = ? AND user_id = ?`,
+            [tripId, userId],
+        );
+
+        if (membership.length === 0 || membership[0].role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "เฉพาะ Owner เท่านั้นที่สร้างลิงก์เชิญได้",
+            });
+        }
+
+        const token = jwt.sign(
+            { tripId: Number(tripId), type: "trip-invite" },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" },
+        );
+        const clientUrl = (process.env.CLIENT_URL || "http://localhost:5173").split(",")[0].trim();
+
+        res.json({
+            success: true,
+            data: { inviteUrl: `${clientUrl}/invite/${token}` },
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "ไม่สามารถสร้างลิงก์เชิญได้" });
+    }
+}
+
+async function getTripInviteInfo(req, res) {
+    try {
+        const payload = jwt.verify(req.params.token, process.env.JWT_SECRET);
+        if (payload.type !== "trip-invite") {
+            return res.status(400).json({ success: false, message: "ลิงก์เชิญไม่ถูกต้อง" });
+        }
+
+        const [trips] = await db.promise().query(
+            `SELECT id, name, description FROM trips WHERE id = ?`,
+            [payload.tripId],
+        );
+        if (trips.length === 0) {
+            return res.status(404).json({ success: false, message: "ไม่พบทริปนี้" });
+        }
+
+        res.json({ success: true, data: { trip: trips[0] } });
+    } catch (error) {
+        res.status(400).json({ success: false, message: "ลิงก์เชิญหมดอายุหรือไม่ถูกต้อง" });
+    }
+}
+
+async function acceptTripInvite(req, res) {
+    try {
+        const payload = jwt.verify(req.params.token, process.env.JWT_SECRET);
+        if (payload.type !== "trip-invite") {
+            return res.status(400).json({ success: false, message: "ลิงก์เชิญไม่ถูกต้อง" });
+        }
+
+        const [trips] = await db.promise().query(
+            `SELECT id, name FROM trips WHERE id = ?`,
+            [payload.tripId],
+        );
+        if (trips.length === 0) {
+            return res.status(404).json({ success: false, message: "ไม่พบทริปนี้" });
+        }
+
+        const [existing] = await db.promise().query(
+            `SELECT id FROM trip_members WHERE trip_id = ? AND user_id = ?`,
+            [payload.tripId, req.user.id],
+        );
+        if (existing.length === 0) {
+            await db.promise().query(
+                `INSERT INTO trip_members (trip_id, user_id, role) VALUES (?, ?, 'member')`,
+                [payload.tripId, req.user.id],
+            );
+        }
+
+        res.json({ success: true, data: { tripId: payload.tripId } });
+    } catch (error) {
+        res.status(400).json({ success: false, message: "ลิงก์เชิญหมดอายุหรือไม่ถูกต้อง" });
+    }
+}
+
+async function updateTripMemberRole(req, res) {
+    try {
+        const tripId = req.params.tripId;
+        const targetUserId = req.params.userId;
+        const { role } = req.body;
+        const allowedRoles = ["member", "treasurer"];
+
+        if (!allowedRoles.includes(role)) {
+            return res.status(400).json({ success: false, message: "role ไม่ถูกต้อง" });
+        }
+
+        const [owner] = await db.promise().query(
+            `SELECT role FROM trip_members WHERE trip_id = ? AND user_id = ?`,
+            [tripId, req.user.id],
+        );
+        if (owner.length === 0 || owner[0].role !== "owner") {
+            return res.status(403).json({ success: false, message: "เฉพาะ Owner เท่านั้นที่เปลี่ยน role ได้" });
+        }
+
+        const [target] = await db.promise().query(
+            `SELECT role FROM trip_members WHERE trip_id = ? AND user_id = ?`,
+            [tripId, targetUserId],
+        );
+        if (target.length === 0) {
+            return res.status(404).json({ success: false, message: "ไม่พบสมาชิกในทริปนี้" });
+        }
+        if (target[0].role === "owner") {
+            return res.status(400).json({ success: false, message: "ไม่สามารถเปลี่ยน role ของ Owner ได้" });
+        }
+
+        await db.promise().query(
+            `UPDATE trip_members SET role = ? WHERE trip_id = ? AND user_id = ?`,
+            [role, tripId, targetUserId],
+        );
+        res.json({ success: true, data: { user_id: Number(targetUserId), role } });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "ไม่สามารถเปลี่ยน role ได้" });
+    }
+}
+
 module.exports = {
     createTrip,
     getTrips,
@@ -630,5 +758,9 @@ module.exports = {
     getTripMembers,
     addTripMember,
     removeTripMember,
-    leaveTrip
+    leaveTrip,
+    createTripInvite,
+    getTripInviteInfo,
+    acceptTripInvite,
+    updateTripMemberRole
 };

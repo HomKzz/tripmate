@@ -9,7 +9,11 @@ const {
     getTripMembers,
     addTripMember,
     removeTripMember,
-    leaveTrip
+    leaveTrip,
+    createTripInvite,
+    getTripInviteInfo,
+    acceptTripInvite,
+    updateTripMemberRole
 } = require("../controllers/tripController");
 
 const authenticateToken = require("../middleware/authMiddleware");
@@ -31,6 +35,25 @@ router.post(
     "/:tripId/members",
     authenticateToken,
     addTripMember
+);
+router.get(
+    "/:tripId/invite",
+    authenticateToken,
+    createTripInvite
+);
+router.get(
+    "/invite/:token",
+    getTripInviteInfo
+);
+router.post(
+    "/invite/:token/accept",
+    authenticateToken,
+    acceptTripInvite
+);
+router.patch(
+    "/:tripId/members/:userId/role",
+    authenticateToken,
+    updateTripMemberRole
 );
 router.delete(
     "/:tripId/members/me",

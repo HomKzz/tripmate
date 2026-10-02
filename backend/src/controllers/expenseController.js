@@ -235,17 +235,17 @@ async function saveExpenseSplits(req, res) {
 
     try {
         const [expenses] = await connection.query(
-            `SELECT e.id, e.amount, e.trip_id
+            `SELECT e.id, e.amount, e.trip_id, tm.role
              FROM expenses e
              INNER JOIN trip_members tm ON tm.trip_id = e.trip_id
              WHERE e.id = ? AND tm.user_id = ?`,
             [expenseId, userId]
         );
 
-        if (expenses.length === 0) {
+        if (expenses.length === 0 || !["owner", "treasurer"].includes(expenses[0].role)) {
             return res.status(403).json({
                 success: false,
-                message: "คุณไม่มีสิทธิ์จัดการค่าใช้จ่ายนี้"
+                message: "เฉพาะ Owner หรือเหรัญญิกเท่านั้นที่จัดการค่าใช้จ่ายนี้ได้"
             });
         }
 

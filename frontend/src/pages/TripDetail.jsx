@@ -228,7 +228,7 @@ function TripDetail() {
                     </div>
                     {member.role && (
                       <span className="ml-auto shrink-0 rounded-full bg-[#f8f0e2] px-2.5 py-1 text-[11px] font-semibold text-[#a87942]">
-                        {member.role === "owner" ? "เจ้าของ" : "สมาชิก"}
+                        {member.role === "owner" ? "เจ้าของ" : member.role === "treasurer" ? "เหรัญญิก" : "สมาชิก"}
                       </span>
                     )}
                   </div>

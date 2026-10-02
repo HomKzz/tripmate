@@ -4,3 +4,4 @@ export * from "./authService";
 export * as tripService from "./tripService";
 export * as itineraryService from "./itineraryService";
 export * as expenseService from "./expenseService";
+export * as aiService from "./aiService";

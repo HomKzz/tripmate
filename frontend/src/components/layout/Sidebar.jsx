@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Calculator, LayoutDashboard, Map, X } from "lucide-react";
+import { Calculator, LayoutDashboard, Map, Sparkles, UserPlus, X } from "lucide-react";
 import Brand from "../ui/Brand";
 
 const menus = [
     { name: "ภาพรวม", path: "/", icon: LayoutDashboard },
     { name: "ทริปของฉัน", path: "/trips", icon: Map },
-    { name: "คิดค่าใช้จ่ายรายคน", path: "/expense-splits", icon: Calculator }
+    { name: "คิดค่าใช้จ่ายรายคน", path: "/expense-splits", icon: Calculator },
+    { name: "เชิญสมาชิก", path: "/trip-members", icon: UserPlus },
+    { name: "วางแผนทริปด้วย AI", path: "/ai-planner", icon: Sparkles }
 ];
 
 function Sidebar({ isOpen, onClose }) {

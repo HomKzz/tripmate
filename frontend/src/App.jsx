@@ -10,6 +10,9 @@ import Trips from "./pages/Trips";
 import Dashboard from "./pages/Dashboard";
 import TripDetail from "./pages/TripDetail";
 import ExpenseSplits from "./pages/ExpenseSplits";
+import TripMembers from "./pages/TripMembers";
+import InviteAccept from "./pages/InviteAccept";
+import AIPlanner from "./pages/AIPlanner";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/layout/Layout";
@@ -30,6 +33,11 @@ function App() {
                 <Route
                     path="/register"
                     element={<Register />}
+                />
+
+                <Route
+                    path="/invite/:token"
+                    element={<InviteAccept />}
                 />
 
 
@@ -66,6 +74,26 @@ function App() {
                     <Route
                         path="/expense-splits"
                         element={<ExpenseSplits />}
+                    />
+
+                    <Route
+                        path="/expense-splits/:id"
+                        element={<ExpenseSplits />}
+                    />
+
+                    <Route
+                        path="/trip-members"
+                        element={<TripMembers />}
+                    />
+
+                    <Route
+                        path="/trip-members/:id"
+                        element={<TripMembers />}
+                    />
+
+                    <Route
+                        path="/ai-planner"
+                        element={<AIPlanner />}
                     />
 
                     <Route

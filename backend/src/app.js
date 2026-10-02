@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 const itineraryRoutes = require("./routes/itineraryRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api", itineraryRoutes);
 app.use("/api", expenseRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/api/health", (req, res) => {
     res.json({

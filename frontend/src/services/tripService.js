@@ -44,6 +44,26 @@ export async function addMember(tripId, email) {
     return response.data;
 }
 
+export async function getInviteLink(tripId) {
+    const response = await apiClient.get(`/trips/${tripId}/invite`);
+    return response.data;
+}
+
+export async function acceptInvite(token) {
+    const response = await apiClient.post(`/trips/invite/${token}/accept`);
+    return response.data;
+}
+
+export async function getInviteInfo(token) {
+    const response = await apiClient.get(`/trips/invite/${token}`);
+    return response.data;
+}
+
+export async function updateMemberRole(tripId, userId, role) {
+    const response = await apiClient.patch(`/trips/${tripId}/members/${userId}/role`, { role });
+    return response.data;
+}
+
 export async function removeMember(tripId, userId) {
     const response = await apiClient.delete(
         `/trips/${tripId}/members/${userId}`
